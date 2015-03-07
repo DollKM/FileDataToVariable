@@ -43,6 +43,10 @@ void FDV::ConvertFToV(const std::string& directory)
         datas.push_back(data);
     }
     WriteVariable(directory,datas);
+    for (FDV_Data* data : datas)
+    {
+        delete data;
+    }
 }
 
 void FDV::WriteVariable(const  std::string& directory,const std::vector<FDV_Data*>& datas)
@@ -73,12 +77,11 @@ class FDV_Data\n\
 public:\n\
     FDV_Data():bytes(),size(0){}\n\
     ~FDV_Data(){if (bytes) {delete [] bytes;}}\n\
-    unsigned char* bytes;\n\
+    const unsigned char* bytes;\n\
     size_t size;\n\
     std::string path;\n\
 };\n\
-extern unsigned char* read_file(const char* path,long& length);\n\
-extern void clear_cache(const char* path);//当path为NULL时，所有缓存都会被清空\n\
+extern const unsigned char* read_file(const char* path,long& length);\n\
 }\n\
 \n\
 #endif /* defined(__FileDataToVariable__fdv_res__) */\n");
@@ -103,92 +106,69 @@ extern void clear_cache(const char* path);//当path为NULL时，所有缓存都�
 using namespace std;\n\
 \n\
 namespace fdv {\n\
-    typedef vector<unsigned char>* (*fdv_read_res_handler)(bool);\n\
-    static map<string, fdv_read_res_handler> s_all_handlers;\n\
-    \n");
+static map<string, FDV_Data*> s_all_res;\n\n");
     int k=0;
     for (auto iter = datas.begin(); iter != datas.end(); ++iter,++k) {
         auto d1 = *iter;
 #define t_name1 );text.append(d1->name);text.append(
-        text.append("\
-    vector<unsigned char>* fdv_read_" t_name1 "(bool is_clear)\n\
-    {\n\
-        static vector<unsigned char>* fdv_" t_name1 "_instance = new vector<unsigned char>();\n\
-        if (is_clear) {\n\
-            fdv_" t_name1 "_instance->clear();\n\
-            return NULL;\n\
-        }\n\
-#define ");
-        char buffer1[16];
-        memset(buffer1, 0, 16);
-        sprintf(buffer1, "fdv%d",k);
+        text.append("//");
+        text.append(d1->path);
+        text.append("\nstatic long fdv_len_" t_name1 "=");
+        char buffer1[8];
+        memset(buffer1, 0, 8);
+        sprintf(buffer1, "%ld;\n",d1->size);
         text.append(buffer1);
-        text.append("(x) fdv_" t_name1 "_instance->push_back(x)\n\
-        if (fdv_" t_name1 "_instance->size() == 0) {");
-        
+        text.append("\
+static const unsigned char fdv_" t_name1 "[]={");
         for (long i=0; i<d1->size; ++i)
         {
+            memset(buffer1, 0, 8);
+            sprintf(buffer1, "0x%x",*(d1->bytes+i));
             text.append(buffer1);
-            char buffer2[8];
-            memset(buffer2, 0, 8);
-            sprintf(buffer2, "(0x%02x);",*(d1->bytes+i));
-            text.append(buffer2);
+            if (i != d1->size-1) {
+                text.append(",");
+            }
+            if (i % 16 == 0) {
+                text.append("\n");
+            }
         }
-        text.append("}\n\
-        return fdv_" t_name1 "_instance;\n\
-    }\n\n");
+        text.append("\n};\n");
     }
     text.append("\
     \n\
     void init_fdv()\n\
     {\n\
-        if (s_all_handlers.size() == 0) {\n");
+        if (s_all_res.size() == 0) {\n\
+            FDV_Data* filedata = NULL;\n");
     
     for (auto iter = datas.begin(); iter != datas.end(); ++iter,++k) {
         auto d1 = *iter;
         text.append("\
-            s_all_handlers[\"");
+            filedata=new FDV_Data();\n\
+            filedata->bytes=fdv_" t_name1 ";\n\
+            filedata->size=fdv_len_" t_name1 ";\n\
+            s_all_res[\"");
         text.append(d1->path);
-        text.append("\"]=fdv_read_" t_name1 ";\n");
+        text.append("\"]=filedata;\n");
     }
     
     text.append("\
         }\n\
     }\n\
     \n\
-    unsigned char* read_file(const char* path,long& len)\n\
+    const unsigned char* read_file(const char* path,long& len)\n\
     {\n\
         init_fdv();\n\
-        std::map<std::string,fdv_read_res_handler>::iterator iter = s_all_handlers.find(path);\n\
-        if (iter != s_all_handlers.end()) {\n\
-            vector<unsigned char>* data = (iter->second)(false);\n\
-            len = data->size();\n\
-            return data->data();\n\
+        std::map<std::string,FDV_Data*>::iterator iter = s_all_res.find(path);\n\
+        if (iter != s_all_res.end()) {\n\
+            FDV_Data* data = iter->second;\n\
+            len = data->size;\n\
+            return data->bytes;\n\
         }\n\
         len = 0;\n\
         return NULL;\n\
     }\n\
     \n\
-    void clear_cache(const char* path)\n\
-    {\n\
-        init_fdv();\n\
-        if (path)\n\
-        {\n\
-            std::map<std::string,fdv_read_res_handler>::iterator iter = s_all_handlers.find(path);\n\
-            if (iter != s_all_handlers.end()) {\n\
-                (iter->second)(true);\n\
-                return;\n\
-            }\n\
-        }\n\
-        else\n\
-        {\n\
-            for (std::map<std::string,fdv_read_res_handler>::iterator iter = s_all_handlers.begin();\n\
-                iter != s_all_handlers.end(); ++iter)\n\
-            {\n\
-                (iter->second)(true);\n\
-            }\n\
-        }\n\
-    }\n\
 }\n");
     
     file = fopen((directory+"fdv_res.cpp").c_str(), "w+");
@@ -196,6 +176,8 @@ namespace fdv {\n\
         fwrite(text.c_str(), text.length(), 1, file);
         fclose(file);
     }
+    
+    delete ttext;
 }
 
 void FDV::TraversalAllPath(const  std::string& directory,std::vector<std::string>& paths)
