@@ -54,7 +54,7 @@ void FDV::WriteVariable(const  std::string& directory,const std::vector<FDV_Data
 //  fdv_res.h\n\
 //  FileDataToVariable\n\
 //  该文件由FDV工具生成\n\
-//  工具Git地址\n\
+//  工具Git地址 https://github.com/DollStudio/FileDataToVariable\n\
 //\n\
 //\n\
 \n\
@@ -94,7 +94,7 @@ extern void clear_cache(const char* path);//当path为NULL时，所有缓存都�
 //  fdv_res.cpp\n\
 //  FileDataToVariable\n\
 //  该文件由FDV工具生成\n\
-//  工具Git地址\n\
+//  工具Git地址 https://github.com/DollStudio/FileDataToVariable\n\
 //\n\
 //\n\
 \n\
