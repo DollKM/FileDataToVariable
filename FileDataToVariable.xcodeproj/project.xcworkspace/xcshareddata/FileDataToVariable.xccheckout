@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>75FE529A-A1BE-4B47-84A1-01EC1F677297</string>
+	<key>IDESourceControlProjectName</key>
+	<string>FileDataToVariable</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>6BBFB8A5F266C5FB277664F13FF989E5FD7A6EF5</key>
+		<string>https://github.com/DollStudio/FileDataToVariable.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>FileDataToVariable.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>6BBFB8A5F266C5FB277664F13FF989E5FD7A6EF5</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/DollStudio/FileDataToVariable.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>6BBFB8A5F266C5FB277664F13FF989E5FD7A6EF5</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>6BBFB8A5F266C5FB277664F13FF989E5FD7A6EF5</string>
+			<key>IDESourceControlWCCName</key>
+			<string>FileDataToVariable</string>
+		</dict>
+	</array>
+</dict>
+</plist>
